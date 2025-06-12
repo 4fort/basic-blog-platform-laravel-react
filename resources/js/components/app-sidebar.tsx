@@ -3,8 +3,9 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Home } from 'lucide-react';
+import { Home, User2 } from 'lucide-react';
 import AppLogo from './app-logo';
+import { Button } from './ui/button';
 
 const mainNavItems: NavItem[] = [
     // {
@@ -16,6 +17,11 @@ const mainNavItems: NavItem[] = [
         title: 'Home',
         href: '/home',
         icon: Home,
+    },
+    {
+        title: 'Profile',
+        href: '/profile',
+        icon: User2,
     },
 ];
 
@@ -53,6 +59,13 @@ export function AppSidebar() {
 
             <SidebarFooter>
                 {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton size="lg" asChild>
+                            <Button className="font-bold">Post</Button>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

@@ -1,11 +1,35 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useNewPostContext } from '@/providers/new-post-context';
+import { useForm } from '@inertiajs/react';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { TextareaAutoSize } from './ui/textarea';
+import { usePage } from '@inertiajs/react';
+import { type SharedData } from '@/types';
+import InputError from './input-error';
 
 export default function NewPostDialog() {
     const { isOpen, setIsOpen } = useNewPostContext();
+    const { auth } = usePage<SharedData>().props;
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        user_id: auth.user.id, 
+        body: '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        post(route('posts.store'), {
+            onSuccess: () => {
+                setIsOpen(false);
+                reset();
+            },
+            onError: (formErrors) => {
+                console.error('Form submission error:', formErrors);
+            },
+        });
+    };
 
     return (
         <>
@@ -14,20 +38,32 @@ export default function NewPostDialog() {
                     <DialogHeader>
                         <DialogTitle>New Post</DialogTitle>
                     </DialogHeader>
-                    <div className="flex gap-2">
-                        <div className="">
-                            <Avatar className="size-9">
-                                <AvatarImage src="https://github.com/shadcn.png" />
-                                <AvatarFallback>CN</AvatarFallback>
-                            </Avatar>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="flex gap-2">
+                            <div className="">
+                                <Avatar className="size-9">
+                                    <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                                    <AvatarFallback>{auth.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                            </div>
+                            <div className="flex grow flex-col gap-2">
+                                <TextareaAutoSize
+                                    value={data.body}
+                                    onChange={(e) => setData('body', e.target.value)}
+                                    className="field-sizing-content max-h-96 min-h-24 resize-none text-xl!"
+                                    placeholder="What's on your mind?"
+                                    disabled={processing}
+                                />
+                                <InputError message={errors.body} />
+                            </div>
                         </div>
-                        <div className="flex grow">
-                            <TextareaAutoSize className="field-sizing-content max-h-96 min-h-24 resize-none text-xl!" />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button>Post</Button>
-                    </DialogFooter>
+                        <DialogFooter>
+                            <Button type="submit" disabled={processing || !data.body.trim()}>
+                                {processing ? 'Posting...' : 'Post'}
+                            </Button>
+                        </DialogFooter>
+                    </form>
                 </DialogContent>
             </Dialog>
         </>

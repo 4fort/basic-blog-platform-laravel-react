@@ -21,13 +21,11 @@ class PostController extends Controller
     {
         $request->validate([
             'body' => 'required|string',
-            'relevance' => 'required|integer'
         ]);
 
         Post::create([
             'user_id' => Auth::id(),
             'body' => $request->body,
-            'relevance' => $request->relevance,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
@@ -36,12 +34,10 @@ class PostController extends Controller
     {
         $request->validate([
             'body' => 'required|string',
-            'relevance' => 'required|integer'
         ]);
 
         $post->update([
             'body' => $request->body,
-            'relevance' => $request->relevance
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');

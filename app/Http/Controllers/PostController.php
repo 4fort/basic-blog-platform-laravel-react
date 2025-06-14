@@ -20,6 +20,7 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'title' => 'nullable|string|max:255',
             'body' => 'required|string',
         ]);
 
@@ -33,6 +34,7 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         $request->validate([
+            'title' => 'nullable|string|max:255',
             'body' => 'required|string',
         ]);
 

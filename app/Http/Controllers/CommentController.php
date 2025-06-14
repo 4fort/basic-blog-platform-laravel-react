@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+
 
 class CommentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Post $post)
+
     {
-        //
+         return $post->comments()->with('user')->latest()->get();
     }
 
     /**
@@ -26,9 +29,19 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request, Post $post)
+
     {
-        //
+         $request->validate([
+        'body' => 'required|string|max:1000',
+    ]);
+
+    $comment = $post->comments()->create([
+        'body' => $request->body,
+        'user_id' => $request->user()->id,
+    ]);
+
+    return response()->json($comment->load('user'), 201);
     }
 
     /**

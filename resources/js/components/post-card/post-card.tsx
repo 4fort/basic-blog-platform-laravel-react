@@ -76,7 +76,7 @@ export function PostCard({ post }: PostCardProps) {
             <div className="flex gap-2 rounded-md border border-border bg-accent/10 p-4 transition-colors hover:bg-accent/50">
                 <div className="">
                     <Avatar className="size-9">
-                        <AvatarImage src={`https://api.dicebear.com/9.x/avataaars-neutral/svg?seed=${post.user?.avatar}`} />
+                        <AvatarImage src={post.user?.avatar} dicebear />
                         <AvatarFallback>{getUserInitials(post.user?.name || 'Unknown User')}</AvatarFallback>
                     </Avatar>
                 </div>

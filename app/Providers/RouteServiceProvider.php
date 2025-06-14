@@ -21,9 +21,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
 {
-    Route::middleware('api')
+    Route::middleware('comments')
         ->prefix('api')
-        ->group(base_path('routes/api.php'));
+        ->group(base_path('routes/comments.php'));
 }
 
 }

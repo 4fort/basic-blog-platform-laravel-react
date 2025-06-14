@@ -28,6 +28,11 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    flash?: {
+        success?: string;
+        error?: string;
+        [key: string]: string | undefined;
+    };
     [key: string]: unknown;
 }
 
@@ -40,4 +45,14 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
+}
+
+export interface Post {
+    id: number;
+    user_id: number;
+    title?: string;
+    body: string;
+    created_at: string;
+    updated_at: string;
+    user?: User;
 }

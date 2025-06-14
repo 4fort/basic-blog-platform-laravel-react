@@ -1,3 +1,4 @@
+import { Toaster } from '@/components/ui/sonner';
 import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 import AppProviders from '@/providers/app-providers';
 import { type BreadcrumbItem } from '@/types';
@@ -13,5 +14,6 @@ export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
         <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
             {children}
         </AppLayoutTemplate>
+        <Toaster />
     </AppProviders>
 );

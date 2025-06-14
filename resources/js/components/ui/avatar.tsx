@@ -21,12 +21,17 @@ function Avatar({
 
 function AvatarImage({
   className,
+  dicebear = false,
+  src,
   ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
+}: React.ComponentProps<typeof AvatarPrimitive.Image> & {
+    dicebear?: boolean;
+}) {
   return (
     <AvatarPrimitive.Image
       data-slot="avatar-image"
       className={cn("aspect-square size-full", className)}
+        src={dicebear ? `https://api.dicebear.com/9.x/avataaars-neutral/svg?seed=${src}` : src}
       {...props}
     />
   )

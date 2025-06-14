@@ -5,17 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class PostController extends Controller
 {
     public function index()
     {
         $posts = Post::with('user')->latest()->get();
-        return view('posts.index', compact('posts'));
+        return inertia('home/home', ['posts' => $posts]);
     }
     public function create()
     {
-        return view('posts.create');
+        return;
     }
     public function store(Request $request)
     {
@@ -26,6 +27,7 @@ class PostController extends Controller
 
         Post::create([
             'user_id' => Auth::id(),
+            'title' => $request->title,
             'body' => $request->body,
         ]);
 
@@ -39,11 +41,18 @@ class PostController extends Controller
         ]);
 
         $post->update([
+            'title' => $request->title,
             'body' => $request->body,
         ]);
 
         return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
     }
+    public function show(Post $post)
+    {
+        $post->load('user');
+        return inertia('Posts/Show', ['post' => $post]);
+    }
+
     public function destroy(Post $post)
     {
         $post->delete();

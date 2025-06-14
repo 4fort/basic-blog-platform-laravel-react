@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { useNewPostContext } from '@/providers/new-post-context';
 import { type SharedData } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
+import { useEffect } from 'react';
 import InputError from './input-error';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
@@ -16,13 +17,22 @@ export default function NewPostDialog() {
         body: '',
     });
 
+    // Reset form when dialog opens
+    useEffect(() => {
+        if (isOpen) {
+            reset();
+            // Force clear the body field to ensure fresh state
+            setData('body', '');
+        }
+    }, [isOpen, reset, setData]);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         post(route('posts.store'), {
             onSuccess: () => {
-                setIsOpen(false);
                 reset();
+                setIsOpen(false);
             },
             onError: (formErrors) => {
                 console.error('Form submission error:', formErrors);
@@ -34,15 +44,15 @@ export default function NewPostDialog() {
         <>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>New Post</DialogTitle>
-                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4" key={isOpen ? 'open' : 'closed'}>
+                        <DialogHeader>
+                            <DialogTitle>New Post</DialogTitle>
+                        </DialogHeader>
 
-                    <form onSubmit={handleSubmit}>
                         <div className="flex gap-2">
                             <div className="">
                                 <Avatar className="size-9">
-                                    <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
+                                    <AvatarImage dicebear src={auth.user.avatar} alt={auth.user.name} />
                                     <AvatarFallback>{auth.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
                             </div>

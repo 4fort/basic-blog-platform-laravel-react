@@ -1,6 +1,7 @@
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { useNewPostContext } from '@/providers/new-post-context';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Home, User2 } from 'lucide-react';
@@ -39,6 +40,8 @@ const mainNavItems: NavItem[] = [
 // ];
 
 export function AppSidebar() {
+    const { setIsOpen } = useNewPostContext();
+
     return (
         <Sidebar collapsible="none" variant="floating">
             <SidebarHeader>
@@ -62,7 +65,9 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Button className="font-bold">Post</Button>
+                            <Button className="font-bold" onClick={() => setIsOpen(true)}>
+                                Post
+                            </Button>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

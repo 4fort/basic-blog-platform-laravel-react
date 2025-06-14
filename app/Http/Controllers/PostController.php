@@ -22,7 +22,6 @@ class PostController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'body' => 'required|string',
-            'relevance' => 'required|integer'
         ]);
 
         Post::create([
@@ -37,9 +36,8 @@ class PostController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'body' => 'required|string',
-            'relevance' => 'required|integer'
         ]);
-        
+
         $post->update([
             'body' => $request->body,
         ]);

@@ -16,7 +16,7 @@ const mainNavItems: NavItem[] = [
     // },
     {
         title: 'Home',
-        href: '/home',
+        href: '/posts',
         icon: Home,
     },
     {

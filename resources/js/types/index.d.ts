@@ -28,6 +28,11 @@ export interface SharedData {
     auth: Auth;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
+    flash?: {
+        success?: string;
+        error?: string;
+        [key: string]: string | undefined;
+    };
     [key: string]: unknown;
 }
 

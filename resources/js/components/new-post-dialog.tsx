@@ -1,19 +1,19 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useNewPostContext } from '@/providers/new-post-context';
-import { useForm } from '@inertiajs/react';
+import { type SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
+import InputError from './input-error';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
 import { TextareaAutoSize } from './ui/textarea';
-import { usePage } from '@inertiajs/react';
-import { type SharedData } from '@/types';
-import InputError from './input-error';
 
 export default function NewPostDialog() {
     const { isOpen, setIsOpen } = useNewPostContext();
-    const { auth } = usePage<SharedData>().props;
+    const { auth, flash } = usePage<SharedData>().props;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        user_id: auth.user.id, 
+        user_id: auth.user.id,
         body: '',
     });
 
@@ -23,6 +23,11 @@ export default function NewPostDialog() {
         post(route('posts.store'), {
             onSuccess: () => {
                 setIsOpen(false);
+
+                console.log(flash);
+                if (flash?.success) {
+                    toast(flash.success);
+                }
                 reset();
             },
             onError: (formErrors) => {

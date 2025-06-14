@@ -3,11 +3,11 @@ import { useNewPostContext } from '@/providers/new-post-context';
 import { type SharedData } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
-import InputError from './input-error';
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { TextareaAutoSize } from './ui/textarea';
+import InputError from '../input-error';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { TextareaAutoSize } from '../ui/textarea';
 
 export default function NewPostDialog() {
     const { isOpen, setIsOpen } = useNewPostContext();

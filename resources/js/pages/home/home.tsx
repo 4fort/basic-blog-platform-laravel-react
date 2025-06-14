@@ -1,4 +1,4 @@
-import { PostCard } from '@/components/post-card/post-card';
+import { PostCard } from '@/components/post/post-card/post-card';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Post, SharedData } from '@/types';
 import { Head, usePage } from '@inertiajs/react';

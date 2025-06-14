@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { ArrowBigDown, ArrowBigUp, Edit, Ellipsis, MessageCircle, Trash2 } from 'lucide-react';
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 
 export function PostUpvoteButton({ isActive, count }: { isActive?: boolean; count?: number }) {
     return (

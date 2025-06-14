@@ -1,4 +1,4 @@
-import NewPostDialog from '@/components/new-post-dialog';
+import NewPostDialog from '@/components/post/new-post-dialog';
 import React, { createContext, useContext, useState } from 'react';
 
 export type NewPostContextType = {

@@ -91,7 +91,7 @@ export function PostCard({ post }: PostCardProps) {
                     </section>
                     <article className="mt-2">
                         {post.title && <h3 className="text-lg font-bold">{post.title}</h3>}
-                        <p className="whitespace-pre-wrap">{post.body}</p>
+                        <p className="break-all whitespace-pre-wrap">{post.body}</p>
                     </article>
                     <div className="mt-4 flex items-center gap-2">
                         {/* <PostUpvoteButton /> */}

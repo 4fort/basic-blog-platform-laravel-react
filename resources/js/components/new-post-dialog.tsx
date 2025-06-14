@@ -53,7 +53,7 @@ export default function NewPostDialog() {
                         <div className="flex gap-2">
                             <div className="">
                                 <Avatar className="size-9">
-                                    <AvatarImage dicebear src={auth.user.avatar} alt={auth.user.name} />
+                                    <AvatarImage dicebear src={auth.user.email} alt={auth.user.name} />
                                     <AvatarFallback>{auth.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
                             </div>

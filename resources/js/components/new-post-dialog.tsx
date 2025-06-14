@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import InputError from './input-error';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { TextareaAutoSize } from './ui/textarea';
 
 export default function NewPostDialog() {
@@ -14,14 +15,14 @@ export default function NewPostDialog() {
 
     const { data, setData, post, processing, errors, reset } = useForm({
         user_id: auth.user.id,
+        title: '',
         body: '',
     });
 
-    // Reset form when dialog opens
     useEffect(() => {
         if (isOpen) {
             reset();
-            // Force clear the body field to ensure fresh state
+            setData('title', '');
             setData('body', '');
         }
     }, [isOpen, reset, setData]);
@@ -57,10 +58,18 @@ export default function NewPostDialog() {
                                 </Avatar>
                             </div>
                             <div className="flex grow flex-col gap-2">
+                                <Input
+                                    type="text"
+                                    value={data.title}
+                                    onChange={(e) => setData('title', e.target.value)}
+                                    className="text-xl! font-semibold"
+                                    placeholder="A very catchy title"
+                                    disabled={processing}
+                                />
                                 <TextareaAutoSize
                                     value={data.body}
                                     onChange={(e) => setData('body', e.target.value)}
-                                    className="field-sizing-content max-h-96 min-h-24 resize-none text-xl!"
+                                    className="field-sizing-content max-h-96 min-h-24 resize-none text-lg!"
                                     placeholder="What's on your mind?"
                                     disabled={processing}
                                 />

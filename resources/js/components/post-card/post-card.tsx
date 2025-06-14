@@ -89,8 +89,10 @@ export function PostCard({ post }: PostCardProps) {
                         </div>
                         <PostOptionsDropdown />
                     </section>
-                    {post.title && <h3 className="mt-1 font-medium">{post.title}</h3>}
-                    <p className="mt-2 whitespace-pre-wrap">{post.body}</p>
+                    <article className="mt-2">
+                        {post.title && <h3 className="text-lg font-bold">{post.title}</h3>}
+                        <p className="whitespace-pre-wrap">{post.body}</p>
+                    </article>
                     <div className="mt-4 flex items-center gap-2">
                         {/* <PostUpvoteButton /> */}
                         {/* <PostDownvoteButton /> */}

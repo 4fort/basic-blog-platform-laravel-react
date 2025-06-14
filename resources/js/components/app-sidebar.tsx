@@ -43,7 +43,7 @@ export function AppSidebar() {
     const { setIsOpen } = useNewPostContext();
 
     return (
-        <Sidebar collapsible="none" variant="floating">
+        <Sidebar collapsible="none" variant="sidebar" className="sticky top-0">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

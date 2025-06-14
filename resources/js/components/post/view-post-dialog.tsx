@@ -7,6 +7,7 @@ import { ArrowBigDown, ArrowBigUp, Loader2, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
+import { TextareaAutoSize } from '../ui/textarea';
 
 export default function ViewPostDialog() {
     const { isOpen, setIsOpen, postId } = useViewPostContext();
@@ -18,7 +19,6 @@ export default function ViewPostDialog() {
         if (isOpen && postId) {
             setLoading(true);
 
-            // First, try to find the post in the existing posts data
             // const existingPost = props.posts?.find((p) => p.id === postId);
             // if (existingPost) {
             //     setPost(existingPost);
@@ -46,7 +46,7 @@ export default function ViewPostDialog() {
     return (
         <>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="max-h-[90vh] max-w-2xl overflow-hidden">
+                <DialogContent className="max-h-[90vh] w-4/5! max-w-4/5! overflow-hidden">
                     <DialogHeader>
                         <DialogTitle>Post Details</DialogTitle>
                     </DialogHeader>
@@ -91,6 +91,10 @@ export default function ViewPostDialog() {
                                         <span>Comment</span>
                                     </Button>
                                 </div>
+
+                                <div className="p-1">
+                                    <ViewPostDialogCommentForm />
+                                </div>
                             </div>
                         ) : (
                             <div className="py-8 text-center text-muted-foreground">Post not found</div>
@@ -99,5 +103,41 @@ export default function ViewPostDialog() {
                 </DialogContent>
             </Dialog>
         </>
+    );
+}
+
+export function ViewPostDialogCommentForm() {
+    const [isFocused, setIsFocused] = useState(false);
+
+    return (
+        <div className="mt-4">
+            <TextareaAutoSize
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder="Write a comment..."
+                minRows={2}
+                maxRows={4}
+                className="w-full resize-none"
+            />
+            <div
+                className="mt-2 grid justify-end overflow-hidden"
+                style={{
+                    opacity: isFocused ? 1 : 0,
+                    marginTop: isFocused ? '8px' : `-36px`,
+                    pointerEvents: isFocused ? 'auto' : 'none',
+                    transition: 'all 0.2s ease-in-out',
+                }}
+            >
+                <Button
+                    onClick={() => {
+                        // Handle comment submission logic here
+                    }}
+                    className="overlap-hidden"
+                    disabled={!isFocused}
+                >
+                    Reply
+                </Button>
+            </div>
+        </div>
     );
 }

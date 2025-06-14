@@ -1,7 +1,7 @@
 import { Post } from '@/types';
 import { ArrowBigDown, ArrowBigUp, MessageCircle } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../../ui/avatar';
+import { Button } from '../../ui/button';
 import { PostCommentButton, PostOptionsDropdown } from './post-actions';
 
 interface PostCardProps {

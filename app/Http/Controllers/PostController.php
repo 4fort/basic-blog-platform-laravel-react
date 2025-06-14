@@ -50,7 +50,9 @@ class PostController extends Controller
     public function show(Post $post)
     {
         $post->load('user');
-        return inertia('Posts/Show', ['post' => $post]);
+
+        return response()->json(['post' => $post]);
+
     }
 
     public function destroy(Post $post)

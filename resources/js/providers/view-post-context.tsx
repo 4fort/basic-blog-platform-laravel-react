@@ -1,3 +1,4 @@
+import ViewPostDialog from '@/components/post/view-post-dialog';
 import React from 'react';
 
 export type ViewPostContextType = {
@@ -13,7 +14,12 @@ export const ViewPostProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const [isOpen, setIsOpen] = React.useState(false);
     const [postId, setPostId] = React.useState<number | null>(null);
 
-    return <ViewPostContext.Provider value={{ isOpen, setIsOpen, postId, setPostId }}>{children}</ViewPostContext.Provider>;
+    return (
+        <ViewPostContext.Provider value={{ isOpen, setIsOpen, postId, setPostId }}>
+            {children}
+            <ViewPostDialog />
+        </ViewPostContext.Provider>
+    );
 };
 export const useViewPostContext = (): ViewPostContextType => {
     const context = React.useContext(ViewPostContext);

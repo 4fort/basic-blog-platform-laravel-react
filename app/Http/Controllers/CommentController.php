@@ -30,18 +30,18 @@ class CommentController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(Request $request, Post $post)
-
     {
-         $request->validate([
-        'body' => 'required|string|max:1000',
-    ]);
+        $request->validate([
+            'body' => 'required|string|max:1000',
+        ]);
 
-    $comment = $post->comments()->create([
-        'body' => $request->body,
-        'user_id' => $request->user()->id,
-    ]);
+        $comment = $post->comments()->create([
+            'body' => $request->body,
+            'user_id' => $request->user()->id,
+        ]);
 
-    return response()->json($comment->load('user'), 201);
+        // For Inertia requests, redirect back with success message
+        return redirect()->back()->with('success', 'Comment added successfully.');
     }
 
     /**

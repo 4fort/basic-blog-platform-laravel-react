@@ -1,10 +1,11 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { formatDate, getUserInitials } from '@/lib/utils';
 import { useViewPostContext } from '@/providers/view-post-context';
-import { Post, SharedData } from '@/types';
-import { usePage } from '@inertiajs/react';
+import { Comment, Post, SharedData } from '@/types';
+import { useForm, usePage } from '@inertiajs/react';
 import { ArrowBigDown, ArrowBigUp, Loader2, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import InputError from '../input-error';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { TextareaAutoSize } from '../ui/textarea';
@@ -63,6 +64,7 @@ export default function ViewPostDialog() {
                                         <AvatarImage src={post.user?.email} dicebear />
                                         <AvatarFallback>{getUserInitials(post.user?.name || 'Unknown User')}</AvatarFallback>
                                     </Avatar>
+
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
                                             <h3 className="truncate font-semibold">{post.user?.name || 'Unknown User'}</h3>
@@ -88,12 +90,26 @@ export default function ViewPostDialog() {
                                     </Button>
                                     <Button variant="ghost" className="text-muted-foreground">
                                         <MessageCircle />
-                                        <span>Comment</span>
+                                        <span>Comment ({post.comments?.length || 0})</span>
                                     </Button>
                                 </div>
 
-                                <div className="p-1">
-                                    <ViewPostDialogCommentForm />
+                                <div className="border-t pt-4">
+                                    <ViewPostDialogCommentForm postId={post.id} />
+
+                                    <div className="mt-6 space-y-4">
+                                        <h3 className="text-sm font-semibold text-muted-foreground">Comments ({post.comments?.length || 0})</h3>
+
+                                        {post.comments && post.comments.length > 0 ? (
+                                            <div className="space-y-4">
+                                                {post.comments.map((comment) => (
+                                                    <CommentItem key={comment.id} comment={comment} />
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <p className="text-sm text-muted-foreground italic">No comments yet. Be the first to comment!</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ) : (
@@ -106,38 +122,75 @@ export default function ViewPostDialog() {
     );
 }
 
-export function ViewPostDialogCommentForm() {
+export function CommentItem({ comment }: { comment: Comment }) {
+    return (
+        <div className="flex gap-3">
+            <Avatar className="size-8 flex-shrink-0">
+                <AvatarImage src={comment.user?.email} dicebear />
+                <AvatarFallback className="text-xs">{getUserInitials(comment.user?.name || 'Unknown User')}</AvatarFallback>
+            </Avatar>
+
+            <div className="flex-1 space-y-1">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">{comment.user?.name || 'Unknown User'}</span>
+                    <span className="text-xs text-muted-foreground">{formatDate(comment.created_at)}</span>
+                </div>
+                <p className="text-sm break-words whitespace-pre-wrap text-gray-700">{comment.body}</p>
+            </div>
+        </div>
+    );
+}
+
+export function ViewPostDialogCommentForm({ postId }: { postId: number }) {
     const [isFocused, setIsFocused] = useState(false);
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        body: '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('posts.comments.store', postId), {
+            onSuccess: () => {
+                reset();
+                setIsFocused(false);
+                // Refresh the page to show the new comment
+                window.location.reload();
+            },
+            onError: (formErrors) => {
+                console.error('Form submission error:', formErrors);
+            },
+        });
+    };
 
     return (
         <div className="mt-4">
-            <TextareaAutoSize
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                placeholder="Write a comment..."
-                minRows={2}
-                maxRows={4}
-                className="w-full resize-none"
-            />
-            <div
-                className="mt-2 grid justify-end overflow-hidden"
-                style={{
-                    opacity: isFocused ? 1 : 0,
-                    marginTop: isFocused ? '8px' : `-36px`,
-                    pointerEvents: isFocused ? 'auto' : 'none',
-                    transition: 'all 0.2s ease-in-out',
-                }}
-            >
-                <Button
-                    onClick={() => {
-                        // Handle comment submission logic here
+            <form onSubmit={handleSubmit} className="space-y-2">
+                <TextareaAutoSize
+                    value={data.body}
+                    onChange={(e) => setData('body', e.target.value)}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    placeholder="Write a comment..."
+                    minRows={2}
+                    maxRows={4}
+                    className="w-full resize-none"
+                />
+                <InputError message={errors.body} />
+                <div
+                    className="mt-2 grid justify-end overflow-hidden"
+                    style={{
+                        opacity: isFocused || data.body.trim() ? 1 : 0,
+                        marginTop: isFocused || data.body.trim() ? '8px' : `-36px`,
+                        pointerEvents: isFocused || data.body.trim() ? 'auto' : 'none',
+                        transition: 'all 0.2s ease-in-out',
                     }}
-                    className="overlap-hidden"
-                    disabled={!isFocused}
                 >
-                    Reply
-                </Button>
-            </div>
+                    <Button className="overlap-hidden" disabled={processing || !data.body.trim()} type="submit">
+                        Reply
+                    </Button>
+                </div>
+            </form>
         </div>
     );
 }

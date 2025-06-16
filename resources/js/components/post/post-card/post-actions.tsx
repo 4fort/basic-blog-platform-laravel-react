@@ -1,4 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useViewPostContext } from '@/providers/view-post-context';
+import { Post } from '@/types';
 import { ArrowBigDown, ArrowBigUp, Edit, Ellipsis, MessageCircle, Trash2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 
@@ -20,9 +22,17 @@ export function PostDownvoteButton({ isActive, count }: { isActive?: boolean; co
     );
 }
 
-export function PostCommentButton({ count }: { count?: number }) {
+export function PostCommentButton({ count, post_id }: { count?: number; post_id: Post['id'] }) {
+    const { setIsOpen, setPostId } = useViewPostContext();
     return (
-        <Button variant="ghost" className="text-muted-foreground">
+        <Button
+            onClick={() => {
+                setIsOpen(true);
+                setPostId(post_id);
+            }}
+            variant="ghost"
+            className="text-muted-foreground"
+        >
             <MessageCircle />
             {count && <span>{count}</span>}
         </Button>

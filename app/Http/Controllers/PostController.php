@@ -11,7 +11,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with('user')->latest()->get();
+        $posts = Post::with(['user', 'comments.user'])->latest()->get();
         return inertia('home/home', ['posts' => $posts]);
     }
     public function create()
@@ -49,8 +49,10 @@ class PostController extends Controller
     }
     public function show(Post $post)
     {
-        $post->load('user');
-        return inertia('Posts/Show', ['post' => $post]);
+        $post->load(['user', 'comments.user']);
+
+        return response()->json(['post' => $post]);
+
     }
 
     public function destroy(Post $post)

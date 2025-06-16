@@ -14,7 +14,6 @@ export default function NewPostDialog() {
     const { auth } = usePage<SharedData>().props;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        user_id: auth.user.id,
         title: '',
         body: '',
     });

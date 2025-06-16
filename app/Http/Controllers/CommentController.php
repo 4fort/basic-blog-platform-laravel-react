@@ -40,7 +40,15 @@ class CommentController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        // For Inertia requests, redirect back with success message
+        $comment->load('user');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'comment' => $comment,
+                'message' => 'Comment added successfully.'
+            ], 201);
+        }
+
         return redirect()->back()->with('success', 'Comment added successfully.');
     }
 

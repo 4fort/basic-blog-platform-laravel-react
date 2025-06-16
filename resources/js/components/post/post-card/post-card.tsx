@@ -35,7 +35,7 @@ export function PostCard({ post }: PostCardProps) {
                     <div className="mt-4 flex items-center gap-2">
                         {/* <PostUpvoteButton /> */}
                         {/* <PostDownvoteButton /> */}
-                        <PostCommentButton post_id={post.id} />
+                        <PostCommentButton post_id={post.id} count={post.comments?.length || 0} />
                     </div>
                 </div>
             </div>

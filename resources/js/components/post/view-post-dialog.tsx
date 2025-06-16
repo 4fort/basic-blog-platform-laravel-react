@@ -16,16 +16,57 @@ export default function ViewPostDialog() {
     const [loading, setLoading] = useState(false);
     const { props } = usePage<SharedData & { posts?: Post[] }>();
 
+    const addOptimisticComment = (commentBody: string) => {
+        if (!post) return;
+
+        const optimisticComment: Comment = {
+            id: Date.now(),
+            post_id: post.id,
+            user_id: props.auth.user.id,
+            body: commentBody,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            user: props.auth.user,
+            isOptimistic: true,
+        };
+
+        setPost((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      comments: [optimisticComment, ...(prev.comments || [])],
+                  }
+                : null,
+        );
+
+        return optimisticComment.id;
+    };
+
+    const replaceOptimisticComment = (tempId: number, realComment: Comment) => {
+        setPost((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      comments: prev.comments?.map((comment) => (comment.id === tempId ? realComment : comment)) || [realComment],
+                  }
+                : null,
+        );
+    };
+
+    const removeOptimisticComment = (tempId: number) => {
+        setPost((prev) =>
+            prev
+                ? {
+                      ...prev,
+                      comments: prev.comments?.filter((comment) => comment.id !== tempId) || [],
+                  }
+                : null,
+        );
+    };
+
     useEffect(() => {
         if (isOpen && postId) {
             setLoading(true);
-
-            // const existingPost = props.posts?.find((p) => p.id === postId);
-            // if (existingPost) {
-            //     setPost(existingPost);
-            //     setLoading(false);
-            //     return;
-            // }
 
             fetch(route('posts.show', postId), {
                 headers: {
@@ -41,8 +82,10 @@ export default function ViewPostDialog() {
                 .catch(() => {
                     setLoading(false);
                 });
+        } else if (!isOpen) {
+            setPost(null);
         }
-    }, [isOpen, postId, props.posts]);
+    }, [isOpen, postId]);
 
     return (
         <>
@@ -95,7 +138,12 @@ export default function ViewPostDialog() {
                                 </div>
 
                                 <div className="border-t pt-4">
-                                    <ViewPostDialogCommentForm postId={post.id} />
+                                    <ViewPostDialogCommentForm
+                                        postId={post.id}
+                                        onOptimisticComment={addOptimisticComment}
+                                        onCommentSuccess={replaceOptimisticComment}
+                                        onCommentError={removeOptimisticComment}
+                                    />
 
                                     <div className="mt-6 space-y-4">
                                         <h3 className="text-sm font-semibold text-muted-foreground">Comments ({post.comments?.length || 0})</h3>
@@ -124,7 +172,7 @@ export default function ViewPostDialog() {
 
 export function CommentItem({ comment }: { comment: Comment }) {
     return (
-        <div className="flex gap-3">
+        <div className={`flex gap-3 ${comment.isOptimistic ? 'opacity-70' : ''}`}>
             <Avatar className="size-8 flex-shrink-0">
                 <AvatarImage src={comment.user?.email} dicebear />
                 <AvatarFallback className="text-xs">{getUserInitials(comment.user?.name || 'Unknown User')}</AvatarFallback>
@@ -134,6 +182,7 @@ export function CommentItem({ comment }: { comment: Comment }) {
                 <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">{comment.user?.name || 'Unknown User'}</span>
                     <span className="text-xs text-muted-foreground">{formatDate(comment.created_at)}</span>
+                    {comment.isOptimistic && <span className="text-xs text-muted-foreground italic">Posting...</span>}
                 </div>
                 <p className="text-sm break-words whitespace-pre-wrap text-gray-700">{comment.body}</p>
             </div>
@@ -141,26 +190,66 @@ export function CommentItem({ comment }: { comment: Comment }) {
     );
 }
 
-export function ViewPostDialogCommentForm({ postId }: { postId: number }) {
+export function ViewPostDialogCommentForm({
+    postId,
+    onOptimisticComment,
+    onCommentSuccess,
+    onCommentError,
+}: {
+    postId: number;
+    onOptimisticComment: (commentBody: string) => number | undefined;
+    onCommentSuccess: (tempId: number, realComment: Comment) => void;
+    onCommentError: (tempId: number) => void;
+}) {
     const [isFocused, setIsFocused] = useState(false);
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, processing, errors, reset, clearErrors } = useForm({
         body: '',
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('posts.comments.store', postId), {
-            onSuccess: () => {
-                reset();
-                setIsFocused(false);
-                // Refresh the page to show the new comment
-                window.location.reload();
-            },
-            onError: (formErrors) => {
-                console.error('Form submission error:', formErrors);
-            },
-        });
+
+        if (!data.body.trim()) return;
+
+        clearErrors();
+
+        const tempId = onOptimisticComment(data.body);
+        if (!tempId) return;
+
+        const commentBody = data.body;
+        reset();
+        setIsFocused(false);
+
+        try {
+            const response = await fetch(route('posts.comments.store', postId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                },
+                body: JSON.stringify({
+                    body: commentBody,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to post comment');
+            }
+
+            const result = await response.json();
+
+            onCommentSuccess(tempId, result.comment);
+        } catch (error) {
+            console.error('Comment submission error:', error);
+
+            onCommentError(tempId);
+
+            setData('body', commentBody);
+            setIsFocused(true);
+        }
     };
 
     return (
@@ -175,6 +264,7 @@ export function ViewPostDialogCommentForm({ postId }: { postId: number }) {
                     minRows={2}
                     maxRows={4}
                     className="w-full resize-none"
+                    disabled={processing}
                 />
                 <InputError message={errors.body} />
                 <div
@@ -187,7 +277,7 @@ export function ViewPostDialogCommentForm({ postId }: { postId: number }) {
                     }}
                 >
                     <Button className="overlap-hidden" disabled={processing || !data.body.trim()} type="submit">
-                        Reply
+                        {processing ? 'Posting...' : 'Reply'}
                     </Button>
                 </div>
             </form>

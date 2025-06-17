@@ -36,7 +36,7 @@ export default function PostPage({ post }: PostProps) {
                             <span className="text-muted-foreground">•</span>
                             <p className="text-sm text-muted-foreground">{formatDate(post.created_at)}</p>
                         </div>
-                        <PostOptionsDropdown />
+                        <PostOptionsDropdown post={post} />
                     </section>
                     <article className="mt-2">
                         {post.title && <h3 className="text-lg font-bold">{post.title}</h3>}

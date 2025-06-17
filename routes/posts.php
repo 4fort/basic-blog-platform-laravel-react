@@ -10,5 +10,6 @@ Route::middleware('auth')->group(function () {
     Route::post('posts/{post}/comments', [CommentController::class, 'store'])->name('posts.comments.store');
     Route::get('posts/{post}/comments', [CommentController::class, 'index'])->name('posts.comments.index');
     Route::get('post/{post}', [PostController::class, 'show'])->name('posts.show');
+    Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
 });
 

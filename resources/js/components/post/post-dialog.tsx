@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useNewPostContext } from '@/providers/new-post-context';
+import { usePostDialogContext } from '@/providers/post-dialog-context';
 import { type SharedData } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
@@ -9,11 +9,11 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { TextareaAutoSize } from '../ui/textarea';
 
-export default function NewPostDialog() {
-    const { isOpen, setIsOpen } = useNewPostContext();
+export default function PostDialog() {
+    const { isOpen, setIsOpen, selectedPost, setSelectedPost } = usePostDialogContext();
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, put, processing, errors, reset } = useForm({
         title: '',
         body: '',
     });
@@ -23,21 +23,41 @@ export default function NewPostDialog() {
             reset();
             setData('title', '');
             setData('body', '');
+
+            if (selectedPost) {
+                setData('title', selectedPost.title || '');
+                setData('body', selectedPost.body || '');
+            }
+        } else {
+            setSelectedPost(null);
         }
-    }, [isOpen, reset, setData]);
+    }, [isOpen, reset, setData, selectedPost, setSelectedPost]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('posts.store'), {
-            onSuccess: () => {
-                reset();
-                setIsOpen(false);
-            },
-            onError: (formErrors) => {
-                console.error('Form submission error:', formErrors);
-            },
-        });
+        if (selectedPost) {
+            put(route('posts.update', selectedPost.id), {
+                onSuccess: () => {
+                    reset();
+                    setIsOpen(false);
+                },
+                onError: (formErrors) => {
+                    console.error('Form submission error:', formErrors);
+                },
+                preserveScroll: true,
+            });
+        } else {
+            post(route('posts.store'), {
+                onSuccess: () => {
+                    reset();
+                    setIsOpen(false);
+                },
+                onError: (formErrors) => {
+                    console.error('Form submission error:', formErrors);
+                },
+            });
+        }
     };
 
     return (
@@ -46,7 +66,7 @@ export default function NewPostDialog() {
                 <DialogContent>
                     <form onSubmit={handleSubmit} className="space-y-4" key={isOpen ? 'open' : 'closed'}>
                         <DialogHeader>
-                            <DialogTitle>New Post</DialogTitle>
+                            <DialogTitle>{selectedPost ? 'Edit Post' : 'New Post'}</DialogTitle>
                         </DialogHeader>
 
                         <div className="flex gap-2">
@@ -77,7 +97,7 @@ export default function NewPostDialog() {
                         </div>
                         <DialogFooter>
                             <Button type="submit" disabled={processing || !data.body.trim()}>
-                                {processing ? 'Posting...' : 'Post'}
+                                {processing ? 'Posting...' : selectedPost ? 'Update' : 'Post'}
                             </Button>
                         </DialogFooter>
                     </form>

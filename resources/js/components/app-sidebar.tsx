@@ -4,7 +4,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { usePostDialogContext } from '@/providers/post-dialog-context';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Home, User2 } from 'lucide-react';
+import { Home } from 'lucide-react';
 import AppLogo from './app-logo';
 import { Button } from './ui/button';
 
@@ -19,11 +19,11 @@ const mainNavItems: NavItem[] = [
         href: '/posts',
         icon: Home,
     },
-    {
+    /*  {
         title: 'Profile',
         href: '/profile',
         icon: User2,
-    },
+    }, */
 ];
 
 // const footerNavItems: NavItem[] = [

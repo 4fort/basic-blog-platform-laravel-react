@@ -19,20 +19,28 @@ class PostController extends Controller
         return;
     }
     public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'nullable|string|max:255',
-            'body' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'title' => 'nullable|string|max:255',
+        'body' => 'required|string',
+        'image' => 'nullable|image|max:2048', // max 2MB
+    ]);
 
-        Post::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'body' => $request->body,
-        ]);
+    $imagePath = null;
 
-        return redirect()->route('posts.index')->with('success', 'Post created successfully.');
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('posts', 'public');
     }
+
+    Post::create([
+        'user_id' => Auth::id(),
+        'title' => $request->title,
+        'body' => $request->body,
+        'image_path' => $imagePath,
+    ]);
+
+    return redirect()->route('posts.index')->with('success', 'Post created successfully.');
+}
     public function update(Request $request, Post $post)
     {
         $request->validate([
@@ -45,8 +53,14 @@ class PostController extends Controller
             'body' => $request->body,
         ]);
 
+        if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('posts', 'public');
+        $post->image_path = $imagePath;
+        }
+
         return redirect()->back()->with('success', 'Post updated successfully.');
     }
+
     public function show(Post $post)
     {
         $post->load(['user', 'comments.user']);

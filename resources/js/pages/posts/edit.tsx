@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
@@ -160,6 +161,7 @@ export default function EditPost({ post: post_data }: EditProps) {
                             onPaste={handlePaste}
                         />
                     </div>
+                    <InputError message={errors.body} />
                     <div className="flex justify-end">
                         <Button type="submit">{processing ? 'Updating...' : 'Update'}</Button>
                     </div>

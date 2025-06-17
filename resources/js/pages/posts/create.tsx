@@ -17,6 +17,17 @@ export default function CreatePost() {
         body: '',
     });
 
+    const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+        const clipboardData = e.clipboardData;
+
+        if (clipboardData.files.length === 1) {
+            const file = clipboardData.files[0];
+            if (file.type.startsWith('image/')) {
+                console.log('Pasted image file:', file);
+            }
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Create Post" />
@@ -42,13 +53,13 @@ export default function CreatePost() {
                         value={data.body}
                         onChange={(value) => setData('body', value || '')}
                         height={500}
-                        preview="edit"
+                        preview="live"
                         className="rounded-lg! border bg-background! p-4"
                         textareaProps={{
                             placeholder: 'Write your post content here...',
                             disabled: processing,
-                            className: 'rounded-lg',
                         }}
+                        onPaste={handlePaste}
                     />
                 </div>
             </div>

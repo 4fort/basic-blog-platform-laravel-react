@@ -73,20 +73,23 @@ class PostController extends Controller
 
         return response()->json(['url' => $url]);
     }
-    public function destroyImage(Request $request)
+    public function deleteImage(Request $request)
     {
         $request->validate([
-            'url' => 'required|url',
+            'url' => 'required|string',
         ]);
 
-        $url = parse_url($request->url);
-        $path = ltrim($url['path'], '/');
+        $requestUrl = $request->url;
+        $parsedUrl = parse_url($requestUrl);
+        $pathFromUrl = ltrim($parsedUrl['path'], '/');
 
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        $storagePath = preg_replace('#^storage/#', '', $pathFromUrl);
+
+        if (Storage::disk('public')->exists($storagePath)) {
+            Storage::disk('public')->delete($storagePath);
             return response()->json(['success' => true]);
         }
 
-        return response()->json(['success' => false, 'message' => 'Image not found.'], 404);
+        return response()->json(['success' => false, 'message' => 'Image not found at path: ' . $storagePath], 404);
     }
 }

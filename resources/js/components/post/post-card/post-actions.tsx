@@ -34,7 +34,7 @@ export function PostDownvoteButton({ isActive, count }: { isActive?: boolean; co
     );
 }
 
-export function PostCommentButton({ count, post_id }: { count?: number; post_id: Post['id'] }) {
+export function PostCommentButton({ count, post_id, ...props }: React.ComponentProps<'button'> & { count?: number; post_id: Post['id'] }) {
     // const { setIsOpen, setPostId } = useViewPostContext();
 
     return (
@@ -49,6 +49,7 @@ export function PostCommentButton({ count, post_id }: { count?: number; post_id:
             }}
             variant="ghost"
             className="text-muted-foreground"
+            {...props}
         >
             <MessageCircle />
             {count && <span>{count}</span>}

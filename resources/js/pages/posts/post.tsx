@@ -23,7 +23,7 @@ export default function PostPage({ post }: PostProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={post.title ?? post.body.slice(0, 10)} />
-            <div className="border-b p-4">
+            <div className="p-4">
                 <div className="flex items-center justify-between">
                     <div className="flex gap-2">
                         <Avatar className="size-9">
@@ -46,12 +46,12 @@ export default function PostPage({ post }: PostProps) {
                         {/* <p className="break-all whitespace-pre-wrap">{post.body}</p> */}
                         <MDEditor.Markdown source={post.body} className="markdown-body" style={{ whiteSpace: 'pre-wrap' }} />
                     </article>
-                    <div className="mt-4 flex items-center gap-2">
-                        {/* <PostUpvoteButton /> */}
-                        {/* <PostDownvoteButton /> */}
-                        <PostCommentButton post_id={post.id} count={post.comments?.length || 0} />
-                    </div>
                 </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 border-y p-2">
+                {/* <PostUpvoteButton /> */}
+                {/* <PostDownvoteButton /> */}
+                <PostCommentButton post_id={post.id} count={post.comments?.length || 0} disabled />
             </div>
             <div className="border-b p-4">
                 <PostCommentForm post_id={post.id} />

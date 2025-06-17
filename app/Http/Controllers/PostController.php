@@ -12,11 +12,11 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::with(['user', 'comments.user'])->latest()->get();
-        return inertia('home/home', ['posts' => $posts]);
+        return inertia('posts/home', ['posts' => $posts]);
     }
     public function create()
     {
-        return;
+        return inertia('posts/create');
     }
     public function store(Request $request)
     {
@@ -51,7 +51,7 @@ class PostController extends Controller
     {
         $post->load(['user', 'comments.user']);
 
-        return inertia('home/post', ['post' => $post]);
+        return inertia('posts/post', ['post' => $post]);
     }
     public function destroy(Post $post)
     {

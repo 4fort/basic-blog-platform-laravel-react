@@ -23,13 +23,19 @@ class PostController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'body' => 'required|string',
+            'tags' => 'array',
+            'tags.*' => 'exists:tags,id',
         ]);
 
-        Post::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'body' => $request->body,
-        ]);
+        $post = Post::create([
+        'user_id' => Auth::id(),
+        'title' => $request->title,
+        'body' => $request->body,
+    ]);
+
+        $post->tags()->sync($request->tags ?? []);
+
+        
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -38,12 +44,16 @@ class PostController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'body' => 'required|string',
+            'tags' => 'array',
+            'tags.*' => 'integer|exists:tags,id',
         ]);
 
         $post->update([
             'title' => $request->title,
             'body' => $request->body,
         ]);
+
+        $post->tags()->sync($request->tags ?? []);
 
         return redirect()->back()->with('success', 'Post updated successfully.');
     }

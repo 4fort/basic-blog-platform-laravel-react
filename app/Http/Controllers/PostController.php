@@ -51,10 +51,8 @@ class PostController extends Controller
     {
         $post->load(['user', 'comments.user']);
 
-        return response()->json(['post' => $post]);
-
+        return inertia('home/post', ['post' => $post]);
     }
-
     public function destroy(Post $post)
     {
         $post->delete();

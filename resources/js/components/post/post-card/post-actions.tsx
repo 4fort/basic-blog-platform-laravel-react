@@ -1,6 +1,6 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { useViewPostContext } from '@/providers/view-post-context';
 import { Post } from '@/types';
+import { router } from '@inertiajs/react';
 import { ArrowBigDown, ArrowBigUp, Edit, Ellipsis, MessageCircle, Trash2 } from 'lucide-react';
 import { Button } from '../../ui/button';
 
@@ -23,12 +23,17 @@ export function PostDownvoteButton({ isActive, count }: { isActive?: boolean; co
 }
 
 export function PostCommentButton({ count, post_id }: { count?: number; post_id: Post['id'] }) {
-    const { setIsOpen, setPostId } = useViewPostContext();
+    // const { setIsOpen, setPostId } = useViewPostContext();
+
     return (
         <Button
             onClick={() => {
-                setIsOpen(true);
-                setPostId(post_id);
+                // setIsOpen(true);
+                // setPostId(post_id);
+                router.visit(`/post/${post_id}`, {
+                    preserveState: true,
+                    preserveScroll: true,
+                });
             }}
             variant="ghost"
             className="text-muted-foreground"

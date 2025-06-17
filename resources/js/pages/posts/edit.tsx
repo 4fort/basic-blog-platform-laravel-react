@@ -1,22 +1,26 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem } from '@/types';
+import { BreadcrumbItem, Post } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import MDEditor from '@uiw/react-md-editor';
 import { useEffect, useRef } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Create Post',
-        href: '/posts/create',
+        title: 'Edit Post',
+        href: '/posts/edit',
     },
 ];
 
-export default function CreatePost() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        title: '',
-        body: '',
+interface EditProps {
+    post: Post;
+}
+
+export default function EditPost({ post: post_data }: EditProps) {
+    const { data, setData, put, processing, errors, reset } = useForm({
+        title: post_data.title || '',
+        body: post_data.body || '',
     });
     const prevBodyRef = useRef(data.body);
 
@@ -111,7 +115,7 @@ export default function CreatePost() {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(route('posts.store'), {
+        put(route('posts.update', post_data.id), {
             onSuccess: () => {
                 reset();
             },
@@ -123,7 +127,7 @@ export default function CreatePost() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Create Post" />
+            <Head title="Edit Post" />
             <div className="p-4">
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="space-y-1">
@@ -157,7 +161,7 @@ export default function CreatePost() {
                         />
                     </div>
                     <div className="flex justify-end">
-                        <Button type="submit">{processing ? 'Posting...' : 'Post'}</Button>
+                        <Button type="submit">{processing ? 'Updating...' : 'Update'}</Button>
                     </div>
                 </form>
             </div>

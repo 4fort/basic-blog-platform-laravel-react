@@ -34,6 +34,14 @@ class PostController extends Controller
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
+    public function edit(Post $post)
+    {
+        if ($post->user_id !== Auth::id()) {
+            return redirect()->route('posts.index')->with('error', 'You do not have permission to edit this post.');
+        }
+
+        return inertia('posts/edit', ['post' => $post]);
+    }
     public function update(Request $request, Post $post)
     {
         $request->validate([
@@ -46,7 +54,7 @@ class PostController extends Controller
             'body' => $request->body,
         ]);
 
-        return redirect()->back()->with('success', 'Post updated successfully.');
+        return redirect()->route('posts.show', $post->id)->with('success', 'Post updated successfully.');
     }
     public function show(Post $post)
     {

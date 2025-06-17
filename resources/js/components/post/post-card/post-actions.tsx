@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { usePostDialogContext } from '@/providers/post-dialog-context';
-import { Post } from '@/types';
-import { router, useForm } from '@inertiajs/react';
+import { Post, SharedData } from '@/types';
+import { router, useForm, usePage } from '@inertiajs/react';
 import { ArrowBigDown, ArrowBigUp, Edit, Ellipsis, MessageCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../../ui/button';
@@ -58,8 +58,17 @@ export function PostCommentButton({ count, post_id, ...props }: React.ComponentP
 }
 
 export function PostOptionsDropdown({ post }: { post: Post }) {
+    const { auth } = usePage<SharedData>().props;
+
     const { setIsOpen, setSelectedPost } = usePostDialogContext();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    const canEdit = auth.user?.id === post.user_id;
+    const canDelete = auth.user?.id === post.user_id;
+
+    if (!canEdit && !canDelete) {
+        return null;
+    }
 
     return (
         <>
@@ -70,21 +79,25 @@ export function PostOptionsDropdown({ post }: { post: Post }) {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuItem
-                        onClick={() => {
-                            setIsOpen(true);
-                            setSelectedPost(post || null);
-                        }}
-                    >
-                        <Edit /> Edit Post
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => {
-                            setIsDeleteDialogOpen(true);
-                        }}
-                    >
-                        <Trash2 /> Delete Post
-                    </DropdownMenuItem>
+                    {canEdit && (
+                        <DropdownMenuItem
+                            onClick={() => {
+                                setIsOpen(true);
+                                setSelectedPost(post || null);
+                            }}
+                        >
+                            <Edit /> Edit Post
+                        </DropdownMenuItem>
+                    )}
+                    {canDelete && (
+                        <DropdownMenuItem
+                            onClick={() => {
+                                setIsDeleteDialogOpen(true);
+                            }}
+                        >
+                            <Trash2 /> Delete Post
+                        </DropdownMenuItem>
+                    )}
                 </DropdownMenuContent>
             </DropdownMenu>
             <PostDeleteDialog post={post} isOpen={isDeleteDialogOpen} setIsOpen={setIsDeleteDialogOpen} />

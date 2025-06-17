@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePostDialogContext } from '@/providers/post-dialog-context';
 import { type SharedData } from '@/types';
-import { useForm, usePage } from '@inertiajs/react';
+import { router, useForm, usePage } from '@inertiajs/react';
 import { useEffect } from 'react';
 import InputError from '../input-error';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -93,6 +93,9 @@ export default function PostDialog() {
                                     disabled={processing}
                                 />
                                 <InputError message={errors.body} />
+                                <Button variant="secondary" type="button" onClick={() => router.get(route('posts.edit', selectedPost?.id))}>
+                                    Switch To Markdown Editor
+                                </Button>
                             </div>
                         </div>
                         <DialogFooter>

@@ -11,5 +11,6 @@ Route::middleware('auth')->group(function () {
     Route::get('posts/{post}/comments', [CommentController::class, 'index'])->name('posts.comments.index');
     Route::get('post/{post}', [PostController::class, 'show'])->name('posts.show');
     Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
 });
 

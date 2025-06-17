@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PostController extends Controller
@@ -57,5 +58,35 @@ class PostController extends Controller
     {
         $post->delete();
         return redirect()->route('posts.index')->with('success', 'Post deleted.');
+    }
+
+    // Image upload
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $image = $request->file('image');
+        $path = $image->store('post-images', 'public');
+        $url = asset('storage/' . $path);
+
+        return response()->json(['url' => $url]);
+    }
+    public function destroyImage(Request $request)
+    {
+        $request->validate([
+            'url' => 'required|url',
+        ]);
+
+        $url = parse_url($request->url);
+        $path = ltrim($url['path'], '/');
+
+        if (Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+            return response()->json(['success' => true]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Image not found.'], 404);
     }
 }

@@ -46,12 +46,16 @@ export default function CreatePost() {
         if (clipboardData.files.length === 1) {
             const file = clipboardData.files[0];
             if (file.type.startsWith('image/')) {
+                const tempText = '![uploading...](uploading...)';
+                const initialBodyWithPlaceholder = `${data.body}\n${tempText}\n`;
+                setData('body', initialBodyWithPlaceholder);
+
                 const url = await imageUploadHandler(file);
 
                 if (url) {
-                    setData('body', `${data.body}\n![ImageAlt](${url})\n`);
+                    setData('body', initialBodyWithPlaceholder.replace(tempText, `![ImageAlt](${url})`));
                 } else {
-                    setData('body', `${data.body}\nImage upload failed. Please try again.\n`);
+                    setData('body', initialBodyWithPlaceholder.replace(tempText, 'Image upload failed. Please try again.'));
                 }
             }
         }

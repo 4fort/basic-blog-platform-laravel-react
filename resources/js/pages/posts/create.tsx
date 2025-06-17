@@ -5,7 +5,6 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import MDEditor from '@uiw/react-md-editor';
-import { useEffect, useRef } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,7 +18,7 @@ export default function CreatePost() {
         title: '',
         body: '',
     });
-    const prevBodyRef = useRef(data.body);
+    // const prevBodyRef = useRef(data.body);
 
     const imageUploadHandler = async (image: File) => {
         if (image && image.size === 0) return null;
@@ -65,49 +64,49 @@ export default function CreatePost() {
         }
     };
 
-    const extractImageUrls = (markdown: string): string[] => {
-        const regex = /!\[.*?\]\((.*?)\)/g;
-        const urls: string[] = [];
-        let match;
-        while ((match = regex.exec(markdown)) !== null) {
-            urls.push(match[1]);
-        }
-        return urls;
-    };
+    // const extractImageUrls = (markdown: string): string[] => {
+    //     const regex = /!\[.*?\]\((.*?)\)/g;
+    //     const urls: string[] = [];
+    //     let match;
+    //     while ((match = regex.exec(markdown)) !== null) {
+    //         urls.push(match[1]);
+    //     }
+    //     return urls;
+    // };
 
-    const deleteImageFromServer = async (url: string) => {
-        console.log('deleting');
-        try {
-            const response = await fetch(route('posts.image.delete'), {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({ url }),
-            });
-            if (!response.ok) {
-                console.error('Failed to delete image:', url, response.statusText);
-            }
-        } catch (error) {
-            console.error('Error deleting image:', error);
-        }
-    };
+    // const deleteImageFromServer = async (url: string) => {
+    //     console.log('deleting');
+    //     try {
+    //         const response = await fetch(route('posts.image.delete'), {
+    //             method: 'DELETE',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+    //             },
+    //             body: JSON.stringify({ url }),
+    //         });
+    //         if (!response.ok) {
+    //             console.error('Failed to delete image:', url, response.statusText);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error deleting image:', error);
+    //     }
+    // };
 
-    useEffect(() => {
-        const currentUrls = extractImageUrls(data.body);
-        const previousUrls = extractImageUrls(prevBodyRef.current);
+    // useEffect(() => {
+    //     const currentUrls = extractImageUrls(data.body);
+    //     const previousUrls = extractImageUrls(prevBodyRef.current);
 
-        const removedUrls = previousUrls.filter((url) => !currentUrls.includes(url));
+    //     const removedUrls = previousUrls.filter((url) => !currentUrls.includes(url));
 
-        removedUrls.forEach((url) => {
-            if (url.startsWith(window.location.origin + '/storage/') || url.startsWith('/storage/')) {
-                deleteImageFromServer(url);
-            }
-        });
+    //     removedUrls.forEach((url) => {
+    //         if (url.startsWith(window.location.origin + '/storage/') || url.startsWith('/storage/')) {
+    //             deleteImageFromServer(url);
+    //         }
+    //     });
 
-        prevBodyRef.current = data.body;
-    }, [data.body]);
+    //     prevBodyRef.current = data.body;
+    // }, [data.body]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

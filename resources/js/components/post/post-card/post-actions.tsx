@@ -1,4 +1,5 @@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { usePostDialogContext } from '@/providers/post-dialog-context';
 import { Post } from '@/types';
 import { router } from '@inertiajs/react';
 import { ArrowBigDown, ArrowBigUp, Edit, Ellipsis, MessageCircle, Trash2 } from 'lucide-react';
@@ -44,7 +45,10 @@ export function PostCommentButton({ count, post_id }: { count?: number; post_id:
     );
 }
 
-export function PostOptionsDropdown() {
+export function PostOptionsDropdown({ post }: { post: Post }) {
+    const { setIsOpen, setSelectedPost } = usePostDialogContext();
+
+    console.log(post);
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -53,7 +57,12 @@ export function PostOptionsDropdown() {
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                    onClick={() => {
+                        setIsOpen(true);
+                        setSelectedPost(post || null);
+                    }}
+                >
                     <Edit /> Edit Post
                 </DropdownMenuItem>
                 <DropdownMenuItem>

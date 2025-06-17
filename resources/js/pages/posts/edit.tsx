@@ -5,6 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Post } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import MDEditor from '@uiw/react-md-editor';
+import React, { useEffect, useRef } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,7 +23,23 @@ export default function EditPost({ post: post_data }: EditProps) {
         title: post_data.title || '',
         body: post_data.body || '',
     });
-    // const prevBodyRef = useRef(data.body);
+    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const cursorPosRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        const textarea = document.querySelector('.w-md-editor textarea, textarea[role="textbox"]') as HTMLTextAreaElement | null;
+        if (textarea) {
+            textareaRef.current = textarea;
+        }
+    }, []);
+
+    useEffect(() => {
+        if (cursorPosRef.current !== null && textareaRef.current) {
+            textareaRef.current.selectionStart = textareaRef.current.selectionEnd = cursorPosRef.current;
+            textareaRef.current.focus();
+            cursorPosRef.current = null;
+        }
+    }, [data.body]);
 
     const imageUploadHandler = async (image: File) => {
         if (image && image.size === 0) return null;
@@ -47,70 +64,52 @@ export default function EditPost({ post: post_data }: EditProps) {
         return data.url || null;
     };
 
+    const insertAtCursor = (text: string) => {
+        const textarea = textareaRef.current;
+        if (!textarea) {
+            setData('body', data.body + text);
+            return;
+        }
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const before = data.body.substring(0, start);
+        const after = data.body.substring(end);
+        setData('body', before + text + after);
+        setTimeout(() => {
+            textarea.selectionStart = textarea.selectionEnd = start + text.length;
+            textarea.focus();
+        }, 0);
+    };
+
     const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
         const clipboardData = e.clipboardData;
 
         if (clipboardData.files.length === 1) {
             const file = clipboardData.files[0];
             if (file.type.startsWith('image/')) {
-                const tempText = '![uploading...](uploading...)';
-                const initialBodyWithPlaceholder = `${data.body}\n${tempText}\n`;
-                setData('body', initialBodyWithPlaceholder);
+                const placeholderId = `Uploading image...${Date.now()}_${Math.random().toString(36).slice(2)}`;
+                const tempText = `[${placeholderId}]`;
+                insertAtCursor(`\n${tempText}\n`);
 
                 const url = await imageUploadHandler(file);
+                const markdown = url ? `![ImageAlt](${url})` : 'Image upload failed. Please try again.';
 
-                if (url) {
-                    setData('body', initialBodyWithPlaceholder.replace(tempText, `![ImageAlt](${url})`));
+                const textarea = textareaRef.current;
+                if (textarea) {
+                    const currentValue = textarea.value;
+                    const markdownWithNewline = markdown + '\n\n';
+                    const newValue = currentValue.replace(tempText, markdownWithNewline);
+                    const idx = newValue.indexOf(markdownWithNewline);
+                    if (idx !== -1) {
+                        cursorPosRef.current = idx + markdownWithNewline.length;
+                    }
+                    setData('body', newValue);
                 } else {
-                    setData('body', initialBodyWithPlaceholder.replace(tempText, 'Image upload failed. Please try again.'));
+                    setData('body', (data.body || '').replace(tempText, markdown + '\n'));
                 }
             }
         }
     };
-
-    // const extractImageUrls = (markdown: string): string[] => {
-    //     const regex = /!\[.*?\]\((.*?)\)/g;
-    //     const urls: string[] = [];
-    //     let match;
-    //     while ((match = regex.exec(markdown)) !== null) {
-    //         urls.push(match[1]);
-    //     }
-    //     return urls;
-    // };
-
-    // const deleteImageFromServer = async (url: string) => {
-    //     console.log('deleting');
-    //     try {
-    //         const response = await fetch(route('posts.image.delete'), {
-    //             method: 'DELETE',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-    //             },
-    //             body: JSON.stringify({ url }),
-    //         });
-    //         if (!response.ok) {
-    //             console.error('Failed to delete image:', url, response.statusText);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error deleting image:', error);
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     const currentUrls = extractImageUrls(data.body);
-    //     const previousUrls = extractImageUrls(prevBodyRef.current);
-
-    //     const removedUrls = previousUrls.filter((url) => !currentUrls.includes(url));
-
-    //     removedUrls.forEach((url) => {
-    //         if (url.startsWith(window.location.origin + '/storage/') || url.startsWith('/storage/')) {
-    //             deleteImageFromServer(url);
-    //         }
-    //     });
-
-    //     prevBodyRef.current = data.body;
-    // }, [data.body]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

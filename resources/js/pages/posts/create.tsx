@@ -17,13 +17,42 @@ export default function CreatePost() {
         body: '',
     });
 
-    const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const imageUploadHandler = async (image: File) => {
+        if (image && image.size === 0) return null;
+
+        const formData = new FormData();
+        formData.append('image', image);
+
+        const res = await fetch(route('posts.image.upload'), {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+            },
+        });
+
+        if (!res.ok) {
+            console.error('Image upload failed:', res.statusText);
+            return null;
+        }
+
+        const data = await res.json();
+        return data.url || null;
+    };
+
+    const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
         const clipboardData = e.clipboardData;
 
         if (clipboardData.files.length === 1) {
             const file = clipboardData.files[0];
             if (file.type.startsWith('image/')) {
-                console.log('Pasted image file:', file);
+                const url = await imageUploadHandler(file);
+
+                if (url) {
+                    setData('body', `${data.body}\n![ImageAlt](${url})\n`);
+                } else {
+                    setData('body', `${data.body}\nImage upload failed. Please try again.\n`);
+                }
             }
         }
     };

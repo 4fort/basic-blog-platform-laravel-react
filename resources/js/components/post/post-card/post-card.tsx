@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import { formatDate, getUserInitials } from '@/lib/utils';
 import { Post } from '@/types';
 import MDEditor from '@uiw/react-md-editor';
@@ -30,10 +31,23 @@ export function PostCard({ post }: PostCardProps) {
                         <PostOptionsDropdown post={post} />
                     </section>
                     <article className="mt-2">
-                        {post.title && <h3 className="text-lg font-bold">{post.title}</h3>}
+                        {post.title && <h3 className="mb-6 text-5xl font-bold">{post.title}</h3>}
                         {/* <p className="break-all whitespace-pre-wrap">{post.body}</p> */}
                         <MDEditor.Markdown source={post.body} className="markdown-body" style={{ whiteSpace: 'pre-wrap' }} />
                     </article>
+                    <div className="">
+                        {post.tags.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {post.tags.map((tag, index) => {
+                                    return (
+                                        <Badge key={index} variant="secondary" className="cursor-pointer">
+                                            {tag.name}
+                                        </Badge>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                     <div className="mt-4 flex items-center gap-2">
                         {/* <PostUpvoteButton /> */}
                         {/* <PostDownvoteButton /> */}

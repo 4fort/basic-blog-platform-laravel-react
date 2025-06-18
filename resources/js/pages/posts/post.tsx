@@ -1,6 +1,7 @@
 import InputError from '@/components/input-error';
 import { PostCommentButton, PostOptionsDropdown } from '@/components/post/post-card/post-actions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TextareaAutoSize } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
@@ -20,6 +21,7 @@ export default function PostPage({ post }: PostProps) {
             href: `/post/${post.id}`,
         },
     ];
+    console.log(post);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={post.title ?? post.body.slice(0, 10)} />
@@ -41,12 +43,25 @@ export default function PostPage({ post }: PostProps) {
                     </div>
                 </div>
                 <div className="flex-1">
-                    <article className="mt-2">
+                    <article className="mt-2 pl-4">
                         {post.title && <h3 className="mb-6 text-5xl font-bold">{post.title}</h3>}
                         {/* <p className="break-all whitespace-pre-wrap">{post.body}</p> */}
                         <MDEditor.Markdown source={post.body} className="markdown-body" style={{ whiteSpace: 'pre-wrap' }} />
                     </article>
                 </div>
+            </div>
+            <div className="px-4">
+                {post.tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                        {post.tags.map((tag, index) => {
+                            return (
+                                <Badge key={index} variant="secondary" className="cursor-pointer">
+                                    {tag.name}
+                                </Badge>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
             <div className="mt-4 flex items-center gap-2 border-y p-2">
                 {/* <PostUpvoteButton /> */}

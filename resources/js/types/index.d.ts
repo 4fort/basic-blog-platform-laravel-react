@@ -56,6 +56,7 @@ export interface Post {
     updated_at: string;
     user?: User;
     comments?: Comment[];
+    tags: Tag[];
 }
 
 export interface Comment {
@@ -67,4 +68,11 @@ export interface Comment {
     updated_at: string;
     user?: User;
     isOptimistic?: boolean;
+}
+
+export interface Tag {
+    id: number;
+    name: string;
+    created_at: string;
+    updated_at: string;
 }

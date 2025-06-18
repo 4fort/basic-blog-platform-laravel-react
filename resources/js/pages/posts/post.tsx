@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { formatDate, getUserInitials } from '@/lib/utils';
 import { BreadcrumbItem, Comment, Post } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import MDEditor from '@uiw/react-md-editor';
 
 interface PostProps {
     post: Post;
@@ -22,32 +23,35 @@ export default function PostPage({ post }: PostProps) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={post.title ?? post.body.slice(0, 10)} />
-            <div className="border-b p-4">
-                <div className="">
-                    <Avatar className="size-9">
-                        <AvatarImage src={post.user?.email} dicebear />
-                        <AvatarFallback>{getUserInitials(post.user?.name || 'Unknown User')}</AvatarFallback>
-                    </Avatar>
-                </div>
-                <div className="flex-1">
-                    <section className="flex items-center justify-between">
+            <div className="p-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex gap-2">
+                        <Avatar className="size-9">
+                            <AvatarImage src={post.user?.email} dicebear />
+                            <AvatarFallback>{getUserInitials(post.user?.name || 'Unknown User')}</AvatarFallback>
+                        </Avatar>
                         <div className="flex items-center gap-2">
                             <h2 className="font-semibold">{post.user?.name || 'Unknown User'}</h2>
                             <span className="text-muted-foreground">•</span>
                             <p className="text-sm text-muted-foreground">{formatDate(post.created_at)}</p>
                         </div>
+                    </div>
+                    <div className="flex items-center justify-between">
                         <PostOptionsDropdown post={post} />
-                    </section>
-                    <article className="mt-2">
-                        {post.title && <h3 className="text-lg font-bold">{post.title}</h3>}
-                        <p className="break-all whitespace-pre-wrap">{post.body}</p>
-                    </article>
-                    <div className="mt-4 flex items-center gap-2">
-                        {/* <PostUpvoteButton /> */}
-                        {/* <PostDownvoteButton /> */}
-                        <PostCommentButton post_id={post.id} count={post.comments?.length || 0} />
                     </div>
                 </div>
+                <div className="flex-1">
+                    <article className="mt-2">
+                        {post.title && <h3 className="mb-6 text-5xl font-bold">{post.title}</h3>}
+                        {/* <p className="break-all whitespace-pre-wrap">{post.body}</p> */}
+                        <MDEditor.Markdown source={post.body} className="markdown-body" style={{ whiteSpace: 'pre-wrap' }} />
+                    </article>
+                </div>
+            </div>
+            <div className="mt-4 flex items-center gap-2 border-y p-2">
+                {/* <PostUpvoteButton /> */}
+                {/* <PostDownvoteButton /> */}
+                <PostCommentButton post_id={post.id} count={post.comments?.length || 0} disabled />
             </div>
             <div className="border-b p-4">
                 <PostCommentForm post_id={post.id} />

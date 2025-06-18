@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { usePostDialogContext } from '@/providers/post-dialog-context';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Home } from 'lucide-react';
 import AppLogo from './app-logo';
 import { Button } from './ui/button';
@@ -65,7 +65,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Button className="font-bold" onClick={() => setIsOpen(true)}>
+                            <Button className="font-bold" onClick={() => router.visit('/posts/create')}>
                                 Post
                             </Button>
                         </SidebarMenuButton>

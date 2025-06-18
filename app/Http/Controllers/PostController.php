@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -12,12 +13,25 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::with(['user', 'comments.user'])->latest()->get();
+        $posts = Post::with(['user', 'comments.user', 'tags'])->latest()->get();
+        $posts->each(function ($post) {
+            $post->tags->transform(function ($tag) {
+                return [
+                    'id' => $tag->id,
+                    'name' => $tag->name,
+                ];
+            });
+        });
+
         return inertia('posts/home', ['posts' => $posts]);
     }
     public function create()
     {
-        return inertia('posts/create');
+        $tags = Tag::all();
+
+        return inertia('posts/create', [
+            'tags' => $tags,
+        ]);
     }
     public function store(Request $request)
     {
@@ -29,14 +43,12 @@ class PostController extends Controller
         ]);
 
         $post = Post::create([
-        'user_id' => Auth::id(),
-        'title' => $request->title,
-        'body' => $request->body,
-    ]);
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'body' => $request->body,
+        ]);
 
         $post->tags()->sync($request->tags ?? []);
-
-        
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -63,14 +75,18 @@ class PostController extends Controller
         ]);
 
         $post->tags()->sync($request->tags ?? []);
-      
+
         return redirect()->route('posts.show', $post->id)->with('success', 'Post updated successfully.');
     }
     public function show(Post $post)
     {
-        $post->load(['user', 'comments.user']);
-      
-        $post->tags()->sync($request->tags ?? []);
+        $post->load(['user', 'comments.user', 'tags']);
+        $post->tags->transform(function ($tag) {
+            return [
+                'id' => $tag->id,
+                'name' => $tag->name,
+            ];
+        });
 
         return inertia('posts/post', ['post' => $post]);
     }

@@ -40,7 +40,7 @@ export function PostCard({ post }: PostCardProps) {
                             <div className="mt-2 flex flex-wrap gap-2">
                                 {post.tags.map((tag, index) => {
                                     return (
-                                        <Badge key={index} variant="secondary" className="cursor-pointer">
+                                        <Badge key={index} variant="secondary">
                                             {tag.name}
                                         </Badge>
                                     );

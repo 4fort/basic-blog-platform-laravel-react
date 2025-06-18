@@ -24,13 +24,19 @@ class PostController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'body' => 'required|string',
+            'tags' => 'array',
+            'tags.*' => 'exists:tags,id',
         ]);
 
-        Post::create([
-            'user_id' => Auth::id(),
-            'title' => $request->title,
-            'body' => $request->body,
-        ]);
+        $post = Post::create([
+        'user_id' => Auth::id(),
+        'title' => $request->title,
+        'body' => $request->body,
+    ]);
+
+        $post->tags()->sync($request->tags ?? []);
+
+        
 
         return redirect()->route('posts.index')->with('success', 'Post created successfully.');
     }
@@ -47,6 +53,8 @@ class PostController extends Controller
         $request->validate([
             'title' => 'nullable|string|max:255',
             'body' => 'required|string',
+            'tags' => 'array',
+            'tags.*' => 'integer|exists:tags,id',
         ]);
 
         $post->update([
@@ -54,11 +62,15 @@ class PostController extends Controller
             'body' => $request->body,
         ]);
 
+        $post->tags()->sync($request->tags ?? []);
+      
         return redirect()->route('posts.show', $post->id)->with('success', 'Post updated successfully.');
     }
     public function show(Post $post)
     {
         $post->load(['user', 'comments.user']);
+      
+        $post->tags()->sync($request->tags ?? []);
 
         return inertia('posts/post', ['post' => $post]);
     }

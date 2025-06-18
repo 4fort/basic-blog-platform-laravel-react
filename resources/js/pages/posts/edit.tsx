@@ -1,10 +1,21 @@
 import InputError from '@/components/input-error';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Post } from '@/types';
+import { BreadcrumbItem, Post, Tag } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import MDEditor from '@uiw/react-md-editor';
+import { Trash2 } from 'lucide-react';
 import React, { useEffect, useRef } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -16,12 +27,14 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface EditProps {
     post: Post;
+    tags: Tag[];
 }
 
-export default function EditPost({ post: post_data }: EditProps) {
+export default function EditPost({ post: post_data, tags }: EditProps) {
     const { data, setData, put, processing, errors, reset } = useForm({
         title: post_data.title || '',
         body: post_data.body || '',
+        tags: post_data.tags ? post_data.tags.map((t: Tag) => t.id) : [],
     });
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const cursorPosRef = useRef<number | null>(null);
@@ -145,6 +158,7 @@ export default function EditPost({ post: post_data }: EditProps) {
                         />
                         <div className="text-right text-sm text-muted-foreground">{data.title.length}/255</div>
                     </div>
+                    <PostTagsSelector tagItems={tags} tags={data.tags} setTags={(newTags) => setData('tags', newTags)} />
                     <div className="">
                         <MDEditor
                             value={data.body}
@@ -166,5 +180,79 @@ export default function EditPost({ post: post_data }: EditProps) {
                 </form>
             </div>
         </AppLayout>
+    );
+}
+
+export function PostTagsSelector({ tagItems, tags, setTags }: { tagItems: Tag[]; tags: Tag['id'][]; setTags: (tags: Tag['id'][]) => void }) {
+    const [searchTerm, setSearchTerm] = React.useState('');
+    const filteredTags = tagItems.filter((tag) => tag.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return (
+        <div className="">
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="secondary">Add Tags</Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    {/* <DropdownMenuLabel className="text-muted-foreground">Select Tags</DropdownMenuLabel> */}
+                    <Input
+                        type="text"
+                        placeholder="Search tags..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setSearchTerm(e.target.value);
+                        }}
+                        onKeyDown={(e) => e.stopPropagation()}
+                        className="mb-2"
+                    />
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup className="max-h-[calc(100svh-400px)] overflow-auto">
+                        {filteredTags.map((tag) => (
+                            <DropdownMenuCheckboxItem
+                                key={tag.id}
+                                checked={tags.includes(tag.id)}
+                                onCheckedChange={(checked) => {
+                                    if (checked) {
+                                        setTags([...tags, tag.id]);
+                                    } else {
+                                        setTags(tags.filter((t) => t !== tag.id));
+                                    }
+                                    setSearchTerm('');
+                                }}
+                                className="cursor-pointer"
+                            >
+                                {tag.name}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                        onClick={() => {
+                            if (tags.length > 0) {
+                                setTags([]);
+                            }
+                        }}
+                    >
+                        <Trash2 /> Clear Tags
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            {tags.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                    {tags.map((tag, index) => {
+                        const tagItem = tagItems.find((t) => t.id === tag);
+                        if (!tagItem) return null; // Skip if tag not found
+
+                        return (
+                            <Badge key={index} onClick={() => setTags(tags.filter((t) => t !== tag))} className="cursor-pointer">
+                                {tagItem.name} <span className="text-lg text-muted-foreground">&times;</span>
+                            </Badge>
+                        );
+                    })}
+                </div>
+            )}
+        </div>
     );
 }

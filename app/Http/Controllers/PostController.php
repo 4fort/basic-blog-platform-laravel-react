@@ -57,8 +57,12 @@ class PostController extends Controller
         if ($post->user_id !== Auth::id()) {
             return redirect()->route('posts.index')->with('error', 'You do not have permission to edit this post.');
         }
-
-        return inertia('posts/edit', ['post' => $post]);
+        $post->load('tags');
+        $tags = Tag::all();
+        return inertia('posts/edit', [
+            'post' => $post,
+            'tags' => $tags,
+        ]);
     }
     public function update(Request $request, Post $post)
     {

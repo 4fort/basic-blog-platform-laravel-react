@@ -42,7 +42,7 @@ export function AppSidebar() {
     // const { setIsOpen } = usePostDialogContext();
 
     return (
-        <Sidebar collapsible="none" variant="sidebar" className="sticky top-0">
+        <Sidebar collapsible="offcanvas" variant="sidebar" className="sticky top-0">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

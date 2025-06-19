@@ -63,13 +63,19 @@ DB_CONNECTION=sqlite
 # DB_PASSWORD=your_password
 ```
 
-6. Run database migrations:
+6. Run database migrations and seed the database:
 
 ```bash
-php artisan migrate
+php artisan migrate:fresh --seed
 ```
 
-7. Start the development servers:
+7. Create a symbolic link for storage:
+
+```bash
+php artisan storage:link
+```
+
+8. Start the development servers:
 
 ```bash
 # Run both frontend and backend in 1 terminal
@@ -83,7 +89,7 @@ php artisan serve
 npm run dev
 ```
 
-8. Open [http://localhost:8000](http://localhost:8000) in your browser to see the Laravel application.
+9. Open [http://localhost:8000](http://localhost:8000) in your browser to see the Laravel application.
    Frontend assets will be served via Vite at [http://localhost:5173](http://localhost:5173).
 
 ## 📁 Project Structure
